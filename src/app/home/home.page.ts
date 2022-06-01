@@ -1,43 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-
-import { Storage } from '@ionic/storage-angular';
-import IonicSecureStorageDriver from '@ionic-enterprise/secure-storage/driver';
-
+import { Component } from '@angular/core';
+import { KeyValueStorage } from '@ionic-enterprise/secure-storage/ngx';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage {
 
-  constructor(private storage: Storage) { }
-
-  async ngOnInit() {
-    await this.storage.defineDriver(IonicSecureStorageDriver);
-    await this.storage.setEncryptionKey('secret');
-    await this.storage.create();
-  }
+  constructor(private storage: KeyValueStorage) {}
 
   async test() {
-    await this.storage.set('blar', 'test');
-  }
-
-  async fail() {
     try {
-      await this.storage.defineDriver(IonicSecureStorageDriver);
-      await this.storage.setEncryptionKey('wrongsecret');
-      await this.storage.create();
-    } catch (err) {
-      alert('Got an expected error creating storage: ' + err);
-    }
-    try {
-      await this.storage.get('blar');
-      alert('Shouldnt happen');
-    } catch (err) {
-      // We should get to here because the get fails
-      alert('Got an expected error: ' + err);
+      await this.storage.create('secret');
+      await this.storage.set('blar', 'test');
+      const data = await this.storage.get('blar');
+      console.log('blar =', data);
+    } catch(e) {
+      console.error(e);
     }
   }
-
 
 }
